@@ -55,8 +55,9 @@ public final class Sampler {
         r.status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
         r.plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0);
 
-        // 剩余电量，单位 µAh。广播里没有就再问一次 BatteryManager；都没有就保持 NaN，界面不显示
-        int chargeUah = intent.getIntExtra(BatteryManager.EXTRA_CHARGE_COUNTER, Integer.MIN_VALUE);
+        // 剩余电量，单位 µAh。广播里没有就再问一次 BatteryManager；都没有就保持 NaN，界面不显示。
+        // 注意 EXTRA_CHARGE_COUNTER 是 @hide 常量，只能写字符串字面量 "charge_counter"
+        int chargeUah = intent.getIntExtra("charge_counter", Integer.MIN_VALUE);
         if (chargeUah <= 0 && manager != null) {
             chargeUah = manager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CHARGE_COUNTER);
         }
