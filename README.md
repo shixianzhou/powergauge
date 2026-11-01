@@ -4,6 +4,14 @@
 
 **这是粉丝向重写，非官方作品**，与原作者没有任何隶属关系。功能与交互参考自 B 站 UP 主「晨钟酱Official」的视频《完全免费！我做了一款“小而美”的工具...》（[BV1ScKmzUEbr](https://www.bilibili.com/video/BV1ScKmzUEbr/)）
 
+## 下载
+
+[![Release](https://img.shields.io/github/v/release/shixianzhou/powergauge?label=release)](https://github.com/shixianzhou/powergauge/releases/latest)
+
+到 [Releases](https://github.com/shixianzhou/powergauge/releases/latest) 下载最新的 `PowerGauge-x.y.z.apk`，传到手机上直接安装。Android 8.0 及以上，无需 root，不联网。
+
+> **升级提醒**：v1.5.0 起换用了新的签名证书。如果你装过更早的包，需要先卸载旧版再安装，否则会提示「应用未安装」。此后版本可以正常覆盖升级。
+
 | 项目 | 值 |
 | --- | --- |
 | 包名 | `com.powergauge.app` |
@@ -20,8 +28,9 @@
 
 ## 致谢与声明
 
-- **灵感与功能参考**：晨钟酱Official 的《功率计》2.0.0 及其视频（[BV1ScKmzUEbr](https://www.bilibili.com/video/BV1ScKmzUEbr/)
+- **灵感与功能参考**：晨钟酱Official 的《功率计》2.0.0 及其视频（[BV1ScKmzUEbr](https://www.bilibili.com/video/BV1ScKmzUEbr/)）
 - **非官方、不商用**：不收费、不接广告、不提供付费版；
+- **原创声明**：本仓库只包含独立编写的代码与自绘资源，不包含原版 App 的任何代码、图标、字体或截图；原版《功率计》不在本仓库的授权范围内。
 - **授权**：本仓库代码以 [MIT](LICENSE) 授权。若原作者对公开方式有异议，联系我即可下架，不需要理由。
 
 ## 目录结构
