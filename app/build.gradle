@@ -1,0 +1,39 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.powergauge.app'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.powergauge.app"
+        minSdk 26
+        targetSdk 34
+        versionCode 8
+        versionName "1.5.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    lint {
+        // 全部为系统 API，不需要 lint 阻断构建
+        abortOnError false
+    }
+}
+
+// 刻意不引入任何第三方依赖：AppCompat / Material / Kotlin 全部不用，
+// 这样只要装了 Android Studio 就能直接构建，不会被依赖版本卡住。
+dependencies {
+}

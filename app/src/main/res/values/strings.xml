@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">PowerGauge</string>
+
+    <string name="channel_name">功率实时显示</string>
+    <string name="notif_stop">停止</string>
+    <string name="notif_waiting">等待电池数据…</string>
+
+    <string name="label_voltage">电压</string>
+    <string name="label_current">电流</string>
+    <string name="label_level">电量</string>
+    <string name="label_temp">温度</string>
+    <string name="label_chart">近 3 分钟功率</string>
+
+    <string name="chip_unit">单位</string>
+    <string name="chip_cells">电芯</string>
+    <string name="chip_comp">补偿</string>
+    <string name="chip_help">说明</string>
+
+    <string name="unit_ua">µA（多数手机）</string>
+    <string name="unit_ma">mA（部分机型）</string>
+
+    <string name="dlg_unit_title">电流单位</string>
+    <string name="dlg_cells_title">电芯数量（多电芯机型补偿）</string>
+    <string name="dlg_comp_title">充电功率补偿因数</string>
+    <string name="dlg_comp_msg">手机充电存在转换效率，电池侧功率（本工具测量值）会小于充电头输出功率。\n填入 1.00~1.30 之间的系数，可近似估算充电头侧功率；填 1 表示不做补偿。</string>
+    <string name="dlg_help_title">使用说明</string>
+
+    <string name="help_text">本工具读取的是「电池侧」数据，不是 Type-C 口的输入功率。\n\n· 未充电时，显示的是整机功耗；\n· 充电时，显示的是电池的输入功率（整机输入功率 − 整机功耗）。\n\n因为充电存在转换效率，部分功率会以发热形式损失，所以这里显示的功率会小于充电头的实际输出。想要准确测量充电头输入功率，请使用 USB 电流计；想估算，可以调节「补偿因数」。\n\n如果功率显示为 0.00 或明显偏小：多数手机用 µA 作为电流单位，部分机型用 mA，点底部「单位」切换一下即可。\n\n部分搭载联发科芯片的 OPPO、一加、realme 机型读不到正确电压，属于厂商未开放 battery 服务，本工具无法修复。\n\n想让它在后台/锁屏也持续刷新，请允许通知权限，并把本应用加入系统的电池优化白名单。</string>
+</resources>

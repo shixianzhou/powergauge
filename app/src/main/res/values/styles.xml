@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 深色：默认外观 -->
+    <style name="Theme.PowerGauge.Dark" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:windowBackground">#0B0E13</item>
+        <item name="android:colorAccent">#12E39A</item>
+        <item name="android:statusBarColor">#0B0E13</item>
+        <item name="android:navigationBarColor">#0B0E13</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+    </style>
+
+    <!-- AMOLED：纯黑底，深色模式里最省电的一档 -->
+    <style name="Theme.PowerGauge.Amoled" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:windowBackground">#000000</item>
+        <item name="android:colorAccent">#12E39A</item>
+        <item name="android:statusBarColor">#000000</item>
+        <item name="android:navigationBarColor">#000000</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+    </style>
+
+    <!-- 浅色 -->
+    <style name="Theme.PowerGauge.Light" parent="@android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">#F4F6FA</item>
+        <item name="android:colorAccent">#12E39A</item>
+        <item name="android:statusBarColor">#F4F6FA</item>
+        <item name="android:navigationBarColor">#F4F6FA</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
+    </style>
+
+    <!-- Manifest 里的默认主题；运行时由 Theming.styleRes() 覆盖 -->
+    <style name="AppTheme" parent="@style/Theme.PowerGauge.Dark" />
+</resources>
