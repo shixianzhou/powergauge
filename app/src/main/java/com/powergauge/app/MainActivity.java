@@ -188,7 +188,7 @@ public class MainActivity extends Activity implements Bus.Listener {
         title.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
 
         TextView sub = new TextView(this);
-        sub.setText("v1.5.0");
+        sub.setText("v" + BuildConfig.VERSION_NAME);
         sub.setTextColor(DIM);
         sub.setTextSize(11);
         LinearLayout.LayoutParams subLp = new LinearLayout.LayoutParams(

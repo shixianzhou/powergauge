@@ -1,6 +1,6 @@
 # PowerGauge —— 极简 Android 电池功率计
 
-一个极简的 Android 电池功率计：实时显示电池端电压、电流、功率、电量与温度，并画一条近 3 分钟的功率曲线，支持常驻通知与桌面悬浮窗。
+一个极简的 Android 电池功率计：实时显示电池端电压、电流、功率、电量、剩余电量（mAh）与温度，并画一条近 3 分钟的功率曲线，支持常驻通知与桌面悬浮窗。
 
 **这是粉丝向重写，非官方作品**，与原作者没有任何隶属关系。功能与交互参考自 B 站 UP 主「晨钟酱Official」的视频《完全免费！我做了一款“小而美”的工具...》（[BV1ScKmzUEbr](https://www.bilibili.com/video/BV1ScKmzUEbr/)）
 
@@ -15,7 +15,7 @@
 | 项目 | 值 |
 | --- | --- |
 | 包名 | `com.powergauge.app` |
-| 版本 | 1.5.0 (versionCode 8) |
+| 版本 | 1.5.1 (versionCode 9) |
 | minSdk / targetSdk | 26 / 34 |
 | 语言 | Java 17 |
 | 第三方依赖 | **无**（不用 AppCompat / Material / Kotlin） |

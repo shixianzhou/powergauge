@@ -32,6 +32,11 @@ public final class Fmt {
         return p < 0 ? "--" : String.valueOf(p);
     }
 
+    /** 剩余电量：整数 mAh，例如 "2130 mAh"。 */
+    public static String mah(double mah) {
+        return String.format(Locale.US, "%.0f mAh", mah);
+    }
+
     public static String time() {
         return new java.text.SimpleDateFormat("HH:mm:ss", Locale.US)
                 .format(new java.util.Date());

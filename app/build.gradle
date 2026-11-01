@@ -19,8 +19,13 @@ android {
         applicationId "com.powergauge.app"
         minSdk 26
         targetSdk 34
-        versionCode 8
-        versionName "1.5.0"
+        versionCode 9
+        versionName "1.5.1"
+    }
+
+    buildFeatures {
+        // 标题栏版本号直接取 BuildConfig.VERSION_NAME，免得和这里写的值对不上
+        buildConfig true
     }
 
     if (hasKeystore) {

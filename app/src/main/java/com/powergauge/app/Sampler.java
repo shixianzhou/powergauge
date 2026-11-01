@@ -22,6 +22,7 @@ public final class Sampler {
         public double amps;   // 充电为正，放电为负
         public double watts;  // 充电为正，放电为负
         public double celsius = Double.NaN;
+        public double chargeMah = Double.NaN;  // 剩余电量，读不到就是 NaN
         public String hint;
         public long atMs = System.currentTimeMillis();
 
@@ -53,6 +54,15 @@ public final class Sampler {
 
         r.status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
         r.plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0);
+
+        // 剩余电量，单位 µAh。广播里没有就再问一次 BatteryManager；都没有就保持 NaN，界面不显示
+        int chargeUah = intent.getIntExtra(BatteryManager.EXTRA_CHARGE_COUNTER, Integer.MIN_VALUE);
+        if (chargeUah <= 0 && manager != null) {
+            chargeUah = manager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CHARGE_COUNTER);
+        }
+        if (chargeUah > 0) {
+            r.chargeMah = chargeUah / 1000.0;
+        }
 
         int millivolts = intent.getIntExtra("voltage", 0);
         int rawCurrent = intent.getIntExtra("current_now", Integer.MIN_VALUE);
