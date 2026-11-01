@@ -2,6 +2,15 @@ plugins {
     id 'com.android.application'
 }
 
+// 发布签名从环境变量读取，仓库里不保存任何密钥。
+// 本地：设好下面四个变量后 assembleRelease 才会签名，否则产物是 unsigned。
+// CI ：见 .github/workflows/release.yml
+def ksFile = System.getenv('POWERGAUGE_KEYSTORE_FILE')
+def ksPassword = System.getenv('POWERGAUGE_KEYSTORE_PASSWORD')
+def ksAlias = System.getenv('POWERGAUGE_KEY_ALIAS')
+def ksKeyPassword = System.getenv('POWERGAUGE_KEY_PASSWORD')
+def hasKeystore = ksFile != null && !ksFile.trim().isEmpty()
+
 android {
     namespace 'com.powergauge.app'
     compileSdk 34
@@ -14,11 +23,25 @@ android {
         versionName "1.5.0"
     }
 
+    if (hasKeystore) {
+        signingConfigs {
+            release {
+                storeFile file(ksFile)
+                storePassword ksPassword
+                keyAlias ksAlias
+                keyPassword ksKeyPassword
+            }
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            if (hasKeystore) {
+                signingConfig signingConfigs.release
+            }
         }
     }
 
