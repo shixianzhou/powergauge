@@ -26,8 +26,19 @@ jobs:
           java-version: '17'
           cache: gradle
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Prepare Android SDK
+        run: |
+          SDK="${ANDROID_HOME:-$ANDROID_SDK_ROOT}"
+          if [ -z "$SDK" ]; then
+            echo "::error::runner 上没有 Android SDK"
+            exit 1
+          fi
+          echo "SDK=$SDK"
+          SDKM=$(find "$SDK" -path '*/bin/sdkmanager' -type f | head -n1)
+          echo "sdkmanager=$SDKM"
+          yes | "$SDKM" --licenses >/dev/null 2>&1 || true
+          "$SDKM" --install "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+          ls "$SDK/platforms" "$SDK/build-tools"
 
       - name: Decode signing keystore
         env:
