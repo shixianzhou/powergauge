@@ -1,7 +1,10 @@
 package com.powergauge.app;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.graphics.drawable.GradientDrawable;
+import android.view.Window;
 
 /**
  * 主题与配色：深色 / 浅色 / 跟随系统 / AMOLED 黑。
@@ -99,5 +102,24 @@ public final class Theming {
             return R.style.Theme_PowerGauge_Light;
         }
         return isAmoled(context) ? R.style.Theme_PowerGauge_Amoled : R.style.Theme_PowerGauge_Dark;
+    }
+
+    /**
+     * 统一弹出对话框的底色。系统默认的 Material 对话框是灰色方角，
+     * 和主界面的深色背景放在一起很突兀；这里改成和卡片一致的圆角底色。
+     */
+    public static void styleDialog(Context context, AlertDialog dialog) {
+        Window window = dialog.getWindow();
+        if (window == null) {
+            return;
+        }
+        GradientDrawable background = new GradientDrawable();
+        background.setColor(card(context));
+        background.setCornerRadius(dp(context, 20));
+        window.setBackgroundDrawable(background);
+    }
+
+    private static int dp(Context context, float value) {
+        return Math.round(value * context.getResources().getDisplayMetrics().density);
     }
 }

@@ -13,7 +13,7 @@ import android.view.View;
 
 /**
  * 近 3 分钟的功率曲线：每秒一个采样点，环形缓冲。
- * 画的是功率绝对值（充电/放电分开由颜色体现），带渐变填充。
+ * 中间是 0W 基准线：充电为正，画在基准线上方；放电为负，画在基准线下方。
  */
 public class ChartView extends View {
 
@@ -26,6 +26,7 @@ public class ChartView extends View {
     private final Paint linePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint fillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint gridPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint zeroPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint hintPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Path linePath = new Path();
     private final Path fillPath = new Path();
@@ -43,6 +44,9 @@ public class ChartView extends View {
 
         gridPaint.setStyle(Paint.Style.STROKE);
         gridPaint.setStrokeWidth(1f);
+
+        zeroPaint.setStyle(Paint.Style.STROKE);
+        zeroPaint.setStrokeWidth(1.5f);
 
         hintPaint.setTextAlign(Paint.Align.CENTER);
     }
@@ -72,29 +76,36 @@ public class ChartView extends View {
             return;
         }
         int accent = Theming.accent(getContext());
-        linePaint.setColor(accent);
+        int warning = Theming.warning(getContext());
         gridPaint.setColor(Theming.grid(getContext()));
         hintPaint.setColor(Theming.dim(getContext()));
+        zeroPaint.setColor(Theming.dim(getContext()));
+        zeroPaint.setAlpha(0x88);
 
         float pad = Math.max(6f, h * 0.08f);
         float top = pad;
         float bottom = h - pad;
         float usable = bottom - top;
+        float centerY = top + usable / 2f;
+        float half = usable / 2f;
 
+        // 上下两条边 + 25%/75% 辅助线；正中间的 0W 线单独用更亮的颜色。
         canvas.drawLine(pad, top, w - pad, top, gridPaint);
-        canvas.drawLine(pad, top + usable / 2f, w - pad, top + usable / 2f, gridPaint);
+        canvas.drawLine(pad, top + usable * 0.25f, w - pad, top + usable * 0.25f, gridPaint);
+        canvas.drawLine(pad, top + usable * 0.75f, w - pad, top + usable * 0.75f, gridPaint);
         canvas.drawLine(pad, bottom, w - pad, bottom, gridPaint);
+        canvas.drawLine(pad, centerY, w - pad, centerY, zeroPaint);
 
-        if (count < 8) {
-            // 刚打开时只有几个点、贴在右边像 bug，先给一句提示
-            hintPaint.setTextSize(getResources().getDisplayMetrics().density * 11f);
-            canvas.drawText("正在采集数据…", w / 2f, top + usable / 2f, hintPaint);
-        }
+        hintPaint.setTextSize(getResources().getDisplayMetrics().density * 11f);
         if (count < 2) {
+            if (count < 8) {
+                canvas.drawText("正在采集数据…", w / 2f, centerY, hintPaint);
+            }
             return;
         }
 
-        float max = 5f;
+        // 以 0W 为中心做对称缩放：正功率向上，负功率向下。
+        float max = 1f;
         for (int i = 0; i < count; i++) {
             float v = Math.abs(samples[(head - count + i + CAPACITY) % CAPACITY]);
             if (v > max) {
@@ -109,14 +120,14 @@ public class ChartView extends View {
         linePath.reset();
         fillPath.reset();
         float lastX = 0;
-        float lastY = bottom;
+        float lastY = centerY;
         for (int i = 0; i < count; i++) {
-            float v = Math.abs(samples[(head - count + i + CAPACITY) % CAPACITY]);
+            float v = samples[(head - count + i + CAPACITY) % CAPACITY];
             float x = offsetX + stepX * i;
-            float y = bottom - Math.min(1f, v / max) * usable;
+            float y = centerY - (v / max) * half;
             if (i == 0) {
                 linePath.moveTo(x, y);
-                fillPath.moveTo(x, bottom);
+                fillPath.moveTo(x, centerY);
                 fillPath.lineTo(x, y);
             } else {
                 linePath.lineTo(x, y);
@@ -125,18 +136,50 @@ public class ChartView extends View {
             lastX = x;
             lastY = y;
         }
-        fillPath.lineTo(lastX, bottom);
+        fillPath.lineTo(lastX, centerY);
         fillPath.close();
 
-        fillPaint.setShader(new LinearGradient(0, top, 0, bottom,
-                new int[]{(accent & 0x00FFFFFF) | 0x55000000,
-                        (accent & 0x00FFFFFF)}, null, Shader.TileMode.CLAMP));
+        // 用裁剪把正负半区分开上色：0W 以上绿色，以下橙色，切换点正好在基准线上。
+        fillPaint.setShader(new LinearGradient(0, top, 0, centerY,
+                new int[]{(accent & 0x00FFFFFF) | 0x11000000,
+                        (accent & 0x00FFFFFF) | 0x55000000},
+                null, Shader.TileMode.CLAMP));
+        canvas.save();
+        canvas.clipRect(0, 0, w, centerY);
         canvas.drawPath(fillPath, fillPaint);
+        canvas.restore();
+
+        fillPaint.setShader(new LinearGradient(0, centerY, 0, bottom,
+                new int[]{(warning & 0x00FFFFFF) | 0x55000000,
+                        (warning & 0x00FFFFFF) | 0x11000000},
+                null, Shader.TileMode.CLAMP));
+        canvas.save();
+        canvas.clipRect(0, centerY, w, h);
+        canvas.drawPath(fillPath, fillPaint);
+        canvas.restore();
+
+        // 填充是半透明的，但这里再画一次基准线，保证它始终清楚。
+        canvas.drawLine(pad, centerY, w - pad, centerY, zeroPaint);
+
+        linePaint.setColor(accent);
+        canvas.save();
+        canvas.clipRect(0, 0, w, centerY);
         canvas.drawPath(linePath, linePaint);
+        canvas.restore();
+
+        linePaint.setColor(warning);
+        canvas.save();
+        canvas.clipRect(0, centerY, w, h);
+        canvas.drawPath(linePath, linePaint);
+        canvas.restore();
 
         if (count > 0) {
-            Paint dot = linePaint;
-            canvas.drawCircle(lastX, lastY, 4f, dot);
+            linePaint.setColor(lastY <= centerY ? accent : warning);
+            canvas.drawCircle(lastX, lastY, 4f, linePaint);
+        }
+        if (count < 8) {
+            // 刚打开时只有几个点、贴在右边像 bug，先给一句提示
+            canvas.drawText("正在采集数据…", w / 2f, centerY, hintPaint);
         }
     }
 }

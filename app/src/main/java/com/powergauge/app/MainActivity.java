@@ -15,6 +15,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.text.InputType;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -58,7 +59,9 @@ public class MainActivity extends Activity implements Bus.Listener {
         @Override
         public void run() {
             Sampler.Reading r = Bus.last();
-            if (r != null && r.valid) {
+            // 启动后前 3 秒是充电握手/驱动初始化阶段，功率会虚高，曲线先不采样。
+            if (r != null && r.valid
+                    && SystemClock.elapsedRealtime() - Bus.statsStartAt() >= 3000) {
                 chart.push(r.watts);
             }
             handler.postDelayed(this, prefs.refreshMs());
@@ -182,7 +185,7 @@ public class MainActivity extends Activity implements Bus.Listener {
         row.setGravity(Gravity.CENTER_VERTICAL);
 
         TextView title = new TextView(this);
-        title.setText("PowerGauge");
+        title.setText(R.string.app_name);
         title.setTextColor(TEXT);
         title.setTextSize(20);
         title.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
@@ -296,7 +299,7 @@ public class MainActivity extends Activity implements Bus.Listener {
 
         chart = new ChartView(this);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, dp(96));
+                ViewGroup.LayoutParams.MATCH_PARENT, dp(170));
         lp.topMargin = dp(6);
         box.addView(chart, lp);
         return box;
@@ -375,8 +378,14 @@ public class MainActivity extends Activity implements Bus.Listener {
 
     // ---------------------------------------------------------------- 弹窗
 
+    private void showAppDialog(AlertDialog.Builder builder) {
+        AlertDialog dialog = builder.create();
+        Theming.styleDialog(this, dialog);
+        dialog.show();
+    }
+
     private void showUnitDialog() {
-        new AlertDialog.Builder(this)
+        showAppDialog(new AlertDialog.Builder(this)
                 .setTitle(getString(R.string.dlg_unit_title))
                 .setSingleChoiceItems(new String[]{
                         getString(R.string.unit_ua), getString(R.string.unit_ma)}, prefs.unit(),
@@ -389,12 +398,11 @@ public class MainActivity extends Activity implements Bus.Listener {
                                 dialog.dismiss();
                             }
                         })
-                .setNegativeButton("取消", null)
-                .show();
+                .setNegativeButton("取消", null));
     }
 
     private void showCellsDialog() {
-        new AlertDialog.Builder(this)
+        showAppDialog(new AlertDialog.Builder(this)
                 .setTitle(getString(R.string.dlg_cells_title))
                 .setSingleChoiceItems(
                         new String[]{"单电芯", "双电芯", "三电芯"}, prefs.cells() - 1,
@@ -407,8 +415,7 @@ public class MainActivity extends Activity implements Bus.Listener {
                                 dialog.dismiss();
                             }
                         })
-                .setNegativeButton("取消", null)
-                .show();
+                .setNegativeButton("取消", null));
     }
 
     private void showCompDialog() {
@@ -419,7 +426,7 @@ public class MainActivity extends Activity implements Bus.Listener {
         int pad = dp(16);
         input.setPadding(pad, pad, pad, pad);
 
-        new AlertDialog.Builder(this)
+        showAppDialog(new AlertDialog.Builder(this)
                 .setTitle(getString(R.string.dlg_comp_title))
                 .setMessage(getString(R.string.dlg_comp_msg))
                 .setView(input)
@@ -436,16 +443,14 @@ public class MainActivity extends Activity implements Bus.Listener {
                         refreshNow();
                     }
                 })
-                .setNegativeButton("取消", null)
-                .show();
+                .setNegativeButton("取消", null));
     }
 
     private void showHelp() {
-        new AlertDialog.Builder(this)
+        showAppDialog(new AlertDialog.Builder(this)
                 .setTitle(getString(R.string.dlg_help_title))
                 .setMessage(getString(R.string.help_text))
-                .setPositiveButton("知道了", null)
-                .show();
+                .setPositiveButton("知道了", null));
     }
 
     // ---------------------------------------------------------------- 采样

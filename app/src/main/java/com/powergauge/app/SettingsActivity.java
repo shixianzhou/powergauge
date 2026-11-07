@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.CompoundButton;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.ScrollView;
@@ -63,7 +64,10 @@ public class SettingsActivity extends Activity {
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
         root.setPadding(dp(20), dp(18), dp(20), dp(24));
-        scroll.addView(root);
+        // ScrollView 默认给子 View MATCH_PARENT 高度，内容一多就会被裁掉；
+        // 必须显式用 WRAP_CONTENT，设置页才能继续向下滚动。
+        scroll.addView(root, new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
         root.addView(buildTopBar(), rowParams(0));
 
@@ -81,6 +85,10 @@ public class SettingsActivity extends Activity {
 
         root.addView(sectionTitle("后台保活"), rowParams(dp(16)));
         root.addView(buildBatteryCard(), rowParams(0));
+
+        // 电池信息放在设置页最底部，避免把常用的刷新/通知设置挤下去。
+        root.addView(sectionTitle("电池信息"), rowParams(dp(16)));
+        root.addView(buildBatteryInfoCard(), rowParams(0));
 
         TextView footer = new TextView(this);
         footer.setText("本工具只读取系统 battery 服务上报的电压、电流与温度，不联网、不写外部存储。"
@@ -317,7 +325,8 @@ public class SettingsActivity extends Activity {
                 .setData(Uri.parse("package:" + getPackageName())))) {
             Toast.makeText(this, "在系统页面里允许「显示在其他应用上层」", Toast.LENGTH_LONG).show();
         } else if (tryStart(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION))) {
-            Toast.makeText(this, "找到「PowerGauge」，允许「显示在其他应用上层」", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "找到「" + getString(R.string.app_name)
+                    + "」，允许「显示在其他应用上层」", Toast.LENGTH_LONG).show();
         } else {
             Toast.makeText(this, "这台设备打不开悬浮窗权限页，请到「设置 → 应用 → 特殊权限」里开启",
                     Toast.LENGTH_LONG).show();
@@ -342,6 +351,33 @@ public class SettingsActivity extends Activity {
         } catch (RuntimeException ignored) {
             // 后台被限制时等前台服务自己刷新
         }
+    }
+
+    // ---------------------------------------------------------------- 电池信息
+
+    private View buildBatteryInfoCard() {
+        LinearLayout box = card();
+
+        TextView desc = new TextView(this);
+        desc.setText("查看容量健康度、当前容量、电池损耗和充放电统计。"
+                + "系统不开放设计容量时，可在里面手动填写电池标称容量。");
+        desc.setTextColor(DIM);
+        desc.setTextSize(12);
+        desc.setLineSpacing(dp(3), 1f);
+        box.addView(desc);
+
+        TextView button = actionButton("查看电池信息");
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(SettingsActivity.this, BatteryInfoActivity.class));
+            }
+        });
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        lp.topMargin = dp(12);
+        box.addView(button, lp);
+        return box;
     }
 
     // ---------------------------------------------------------------- 通知
@@ -493,8 +529,8 @@ public class SettingsActivity extends Activity {
         // 2) 退到「电池优化」列表页（设置里的电池界面），并提示要点哪里
         if (Build.VERSION.SDK_INT >= 23
                 && tryStart(new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))) {
-            Toast.makeText(this, "在列表里找到「PowerGauge」，选「不限制」/「允许后台运行」",
-                    Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "在列表里找到「" + getString(R.string.app_name)
+                    + "」，选「不限制」/「允许后台运行」", Toast.LENGTH_LONG).show();
             return;
         }
         // 3) 再退应用详情

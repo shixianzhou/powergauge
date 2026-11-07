@@ -70,6 +70,7 @@ public class PowerService extends Service {
         Sampler.Reading sticky = Sampler.read(
                 registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED)),
                 batteryManager, prefs);
+        BatteryStats.get(this).update(sticky);
         Bus.resetRange();
         Bus.publish(sticky);
         startForegroundCompat(buildNotification(sticky));
@@ -106,6 +107,7 @@ public class PowerService extends Service {
     }
 
     private void publish(Sampler.Reading reading, boolean force) {
+        BatteryStats.get(this).update(reading);
         Bus.publish(reading);
         syncOverlay(reading);
         long now = System.currentTimeMillis();

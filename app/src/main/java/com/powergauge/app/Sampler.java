@@ -23,6 +23,9 @@ public final class Sampler {
         public double watts;  // 充电为正，放电为负
         public double celsius = Double.NaN;
         public double chargeMah = Double.NaN;  // 剩余电量，读不到就是 NaN
+        public int cycleCount = -1;            // 循环次数，系统没报就是 -1
+        public int health = -1;                // BatteryManager.BATTERY_HEALTH_*
+        public String technology;              // Li-ion / Li-poly ...
         public String hint;
         public long atMs = System.currentTimeMillis();
 
@@ -54,6 +57,10 @@ public final class Sampler {
 
         r.status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
         r.plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0);
+        r.health = intent.getIntExtra(BatteryManager.EXTRA_HEALTH, -1);
+        r.technology = intent.getStringExtra(BatteryManager.EXTRA_TECHNOLOGY);
+        // EXTRA_CYCLE_COUNT 是 API 34 常量，这里用字符串字面量，避免旧系统上的兼容问题
+        r.cycleCount = intent.getIntExtra("cycle_count", -1);
 
         // 剩余电量，单位 µAh。广播里没有就再问一次 BatteryManager；都没有就保持 NaN，界面不显示。
         // 注意 EXTRA_CHARGE_COUNTER 是 @hide 常量，只能写字符串字面量 "charge_counter"

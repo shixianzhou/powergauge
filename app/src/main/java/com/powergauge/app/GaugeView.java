@@ -23,7 +23,6 @@ public class GaugeView extends View {
     private final Paint bigPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint subPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint peakPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint mahPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final RectF rect = new RectF();
 
     private Sampler.Reading reading;
@@ -44,8 +43,6 @@ public class GaugeView extends View {
         unitPaint.setTextAlign(Paint.Align.CENTER);
         subPaint.setTextAlign(Paint.Align.CENTER);
         peakPaint.setTextAlign(Paint.Align.CENTER);
-        mahPaint.setTextAlign(Paint.Align.RIGHT);
-        mahPaint.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
     }
 
     public void bind(Sampler.Reading r) {
@@ -121,41 +118,16 @@ public class GaugeView extends View {
         unitPaint.setTextSize(radius * 0.20f);
         canvas.drawText("W", cx, cy + radius * 0.55f, unitPaint);
 
-        // 状态行居中，右端空位放剩余电量（mAh）。两者挤不下时先缩状态文字，实在不行就不画 mAh
+        // 状态行居中；主界面不再显示剩余容量，容量信息统一放在设置 → 电池信息。
         float statusY = cy + radius * 0.86f;
-        float gap = radius * 0.08f;
         String status = statusLine(valid);
-        String mah = mahText();
-        float mahWidth = 0f;
-        if (mah != null) {
-            mahPaint.setColor(Theming.dim(getContext()));
-            mahPaint.setTextSize(radius * 0.14f);
-            mahWidth = mahPaint.measureText(mah);
-        }
-
         subPaint.setTextSize(radius * 0.16f);
-        float statusMax = w - 2f * (mahWidth + (mah == null ? 0f : gap));
+        float statusMax = w * 0.9f;
         float statusWidth = subPaint.measureText(status);
-        if (statusWidth > statusMax && statusMax > 0) {
-            float scaled = subPaint.getTextSize() * statusMax / statusWidth;
-            if (scaled >= radius * 0.10f) {
-                subPaint.setTextSize(scaled);
-            } else {
-                mah = null;
-            }
+        if (statusWidth > statusMax) {
+            subPaint.setTextSize(subPaint.getTextSize() * statusMax / statusWidth);
         }
         canvas.drawText(status, cx, statusY, subPaint);
-        if (mah != null) {
-            canvas.drawText(mah, w - 2f, statusY, mahPaint);
-        }
-    }
-
-    /** 剩余电量文本；设备不报 CHARGE_COUNTER 时返回 null，界面保持原样。 */
-    private String mahText() {
-        if (reading == null || Double.isNaN(reading.chargeMah) || reading.chargeMah <= 0) {
-            return null;
-        }
-        return Fmt.mah(reading.chargeMah);
     }
 
     private String statusLine(boolean valid) {

@@ -84,4 +84,17 @@ public final class Prefs {
     public void setOverlayEnabled(boolean enabled) {
         sp.edit().putBoolean("overlay", enabled).apply();
     }
+
+    /**
+     * 电池标称（设计）容量，单位 mAh；0 表示用户还没填。
+     * 系统没有公开这个值，只能让用户按机型参数填，用来算健康度 / 损耗。
+     */
+    public int designMah() {
+        int v = sp.getInt("design_mah", 0);
+        return v >= 0 && v <= 30000 ? v : 0;
+    }
+
+    public void setDesignMah(int mah) {
+        sp.edit().putInt("design_mah", Math.max(0, Math.min(30000, mah))).apply();
+    }
 }

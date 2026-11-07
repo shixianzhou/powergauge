@@ -1,6 +1,6 @@
 # PowerGauge —— 极简 Android 电池功率计
 
-一个极简的 Android 电池功率计：实时显示电池端电压、电流、功率、电量、剩余电量（mAh）与温度，并画一条近 3 分钟的功率曲线，支持常驻通知与桌面悬浮窗。
+一个极简的 Android 电池功率计：实时显示电池端电压、电流、功率、电量与温度，并画一条带 0W 基准线的近 3 分钟功率曲线（充电绿色在上、放电橙色在下），支持常驻通知与桌面悬浮窗；设置页可查看电池容量健康度与充放电统计。
 
 **这是粉丝向重写，非官方作品**，与原作者没有任何隶属关系。功能与交互参考自 B 站 UP 主「晨钟酱Official」的视频《完全免费！我做了一款“小而美”的工具...》（[BV1ScKmzUEbr](https://www.bilibili.com/video/BV1ScKmzUEbr/)）
 
@@ -15,7 +15,7 @@
 | 项目 | 值 |
 | --- | --- |
 | 包名 | `com.powergauge.app` |
-| 版本 | 1.5.1 (versionCode 9) |
+| 版本 | 1.5.2 (versionCode 10) |
 | minSdk / targetSdk | 26 / 34 |
 | 语言 | Java 17 |
 | 第三方依赖 | **无**（不用 AppCompat / Material / Kotlin） |
@@ -48,15 +48,17 @@ powergauge/
         ├── AndroidManifest.xml
         ├── java/com/powergauge/app/
         │   ├── MainActivity.java   # 单页界面（代码搭 UI）
-        │   ├── SettingsActivity.java # 设置页（主题 / 刷新间隔 / 通知 / 电池白名单）
+        │   ├── SettingsActivity.java # 设置页（主题 / 刷新间隔 / 通知 / 电池信息 / 白名单）
+        │   ├── BatteryInfoActivity.java # 电池信息页（容量 / 健康度 / 充放电统计）
         │   ├── Theming.java        # 四档主题与全部配色
         │   ├── IconView.java       # 齿轮图标（Canvas 画）
         │   ├── PowerService.java   # 前台服务 + 通知
         │   ├── Sampler.java        # 解析 ACTION_BATTERY_CHANGED
         │   ├── Prefs.java          # 单位 / 电芯数 / 补偿因数 / 刷新间隔 / 主题
         │   ├── GaugeView.java      # 240° 仪表盘
-        │   ├── ChartView.java      # 180 点功率曲线
+        │   ├── ChartView.java      # 180 点功率曲线（0W 基准线）
         │   ├── Bus.java            # 进程内读数总线 + 最低/最高统计
+        │   ├── BatteryStats.java   # 充放电积分 / 满电容量估算
         │   ├── OverlayWindow.java  # 悬浮窗（四行读数，可拖动）
         │   └── Fmt.java            # 数字格式
         └── res/

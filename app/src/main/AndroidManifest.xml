@@ -31,6 +31,11 @@
             android:exported="false"
             android:label="设置" />
 
+        <activity
+            android:name=".BatteryInfoActivity"
+            android:exported="false"
+            android:label="电池信息" />
+
         <service
             android:name=".PowerService"
             android:exported="false"
